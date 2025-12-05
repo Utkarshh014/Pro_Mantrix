@@ -4,7 +4,7 @@ import { RoleDocument } from "./roles-permission.model";
 export interface MemberDocument extends Document {
   userId: mongoose.Types.ObjectId;
   workspaceId: mongoose.Types.ObjectId;
-  role: RoleDocument;
+  role: RoleDocument | mongoose.Types.ObjectId;
   joinedAt: Date;
 }
 

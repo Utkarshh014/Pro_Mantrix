@@ -118,7 +118,7 @@ export const loginOrCreateAccountService = async (data: {
         // Auto-repair: Assign MEMBER role if missing
         const memberRole = await RoleModel.findOne({ name: Roles.MEMBER }).session(session);
          if (memberRole) {
-           member.role = memberRole._id;
+           member.role = memberRole._id as mongoose.Types.ObjectId;
            await member.save({ session });
          }
       }

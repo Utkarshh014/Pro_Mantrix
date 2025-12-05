@@ -1,7 +1,7 @@
 import { ErrorCodeEnum } from "../enums/error-code.enum";
 import { Roles } from "../enums/role.enum";
 import MemberModel from "../models/member.model";
-import RoleModel from "../models/roles-permission.model";
+import RoleModel, { RoleDocument } from "../models/roles-permission.model";
 import WorkspaceModel from "../models/workspace.model";
 import {
   BadRequestException,
@@ -37,7 +37,7 @@ export const getMemberRoleInWorkspace = async (
     );
   }
 
-  const roleName = member.role.name;
+  const roleName = (member.role as RoleDocument).name;
 
   return { role: roleName };
 };
