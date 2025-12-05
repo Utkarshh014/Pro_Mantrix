@@ -71,6 +71,36 @@ export const loginOrCreateAccountService = async (data: {
 
       user.currentWorkspace = workspace._id as mongoose.Types.ObjectId;
       await user.save({ session });
+    } else if (!user.currentWorkspace) {
+      // If user exists but has no current workspace, find one or create one
+      const member = await MemberModel.findOne({ userId: user._id }).session(session);
+      
+      if (member) {
+        user.currentWorkspace = member.workspaceId;
+        await user.save({ session });
+      } else {
+         // Create a new workspace if no membership found
+        const workspace = new WorkspaceModel({
+          name: `My Workspace`,
+          description: `Workspace created for ${user.name}`,
+          owner: user._id,
+        });
+        await workspace.save({ session });
+
+        const ownerRole = await RoleModel.findOne({ name: Roles.OWNER }).session(session);
+        if (!ownerRole) throw new NotFoundException("Owner role not found");
+
+        const newMember = new MemberModel({
+          userId: user._id,
+          workspaceId: workspace._id,
+          role: ownerRole._id,
+          joinedAt: new Date(),
+        });
+        await newMember.save({ session });
+
+        user.currentWorkspace = workspace._id as mongoose.Types.ObjectId;
+        await user.save({ session });
+      }
     }
     await session.commitTransaction();
     session.endSession();
