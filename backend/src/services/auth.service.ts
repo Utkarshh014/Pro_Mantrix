@@ -101,6 +101,27 @@ export const loginOrCreateAccountService = async (data: {
         user.currentWorkspace = workspace._id as mongoose.Types.ObjectId;
         await user.save({ session });
       }
+    } else {
+      // User exists and has a current workspace
+      // Check if the membership is valid (has a role)
+      const member = await MemberModel.findOne({
+        userId: user._id,
+        workspaceId: user.currentWorkspace,
+      }).session(session);
+
+      if (!member) {
+        // This shouldn't happen if currentWorkspace is set, but if it does, clear it
+        user.currentWorkspace = null;
+        await user.save({ session });
+        // The next login will trigger the "create workspace" logic above
+      } else if (!member.role) {
+        // Auto-repair: Assign MEMBER role if missing
+        const memberRole = await RoleModel.findOne({ name: Roles.MEMBER }).session(session);
+         if (memberRole) {
+           member.role = memberRole._id;
+           await member.save({ session });
+         }
+      }
     }
     await session.commitTransaction();
     session.endSession();
