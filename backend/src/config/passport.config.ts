@@ -88,10 +88,12 @@ passport.use(
     try {
       const user = await findUserByIdService(payload.userId);
       if (!user) {
+        console.log("JwtStrategy: User not found for payload", payload);
         return done(null, false);
       }
       return done(null, user);
     }catch (error) {
+      console.log("JwtStrategy: Error", error);
       return done(error, false);
     }
   })
