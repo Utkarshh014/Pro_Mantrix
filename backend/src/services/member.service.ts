@@ -30,7 +30,14 @@ export const getMemberRoleInWorkspace = async (
     );
   }
 
-  const roleName = member.role?.name;
+  if (!member.role) {
+    throw new UnauthorizedException(
+      "You do not have a role in this workspace",
+      ErrorCodeEnum.ACCESS_UNAUTHORIZED
+    );
+  }
+
+  const roleName = member.role.name;
 
   return { role: roleName };
 };
