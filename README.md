@@ -16,8 +16,8 @@ Efficient project management and team collaboration are critical for success but
 *   **Authentication**: JWT-based (JSON Web Tokens) with Passport.js (Local & Google OAuth).
 
 ### Deployment
-*   **Frontend**: Vercel (Recommended)
-*   **Backend**: Render / Railway (Recommended)
+*   **Frontend**: Vercel
+*   **Backend**: Render
 *   **Database**: MongoDB Atlas
 
 ## 4. Key Features
