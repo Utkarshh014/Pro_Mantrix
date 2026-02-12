@@ -17,9 +17,6 @@ API.interceptors.request.use(
     const accessToken = useStore.getState().accessToken;
     if (accessToken) {
       config.headers["Authorization"] = 'Bearer ' + accessToken;
-      console.log("Axios Request: Attaching token", accessToken.substring(0, 10) + "...");
-    } else {
-      console.log("Axios Request: No access token found in store");
     }
     return config;
   }

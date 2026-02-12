@@ -7,20 +7,37 @@ import React from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 
 const GoogleOAuth = () => {
+  /* eslint-disable-next-line @typescript-eslint/ban-ts-comment */
+  // @ts-ignore
   const navigate = useNavigate();
   const [params] = useSearchParams();
-  const {setAccessToken} = useStore();
+  const { setAccessToken } = useStore();
   const queryClient = useQueryClient();
 
-  const accessToken = params.get("access_token");
   const currentWorkspace = params.get("currentworkspace");
 
   React.useEffect(() => {
     const handleLogin = async () => {
+      // Try to get token from cookie
+      const getCookie = (name: string): string | null => {
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; ${name}=`);
+        if (parts.length === 2) return parts.pop()?.split(';').shift() || null;
+        return null;
+      };
+      
+      const deleteCookie = (name: string) => {
+        document.cookie = `${name}=; max-age=0; path=/`;
+      };
+
+      const accessToken = getCookie("auth_token");
+
       if (accessToken) {
         setAccessToken(accessToken);
-        await queryClient.refetchQueries({ queryKey: ["authUser"] });
+        deleteCookie("auth_token"); // Clean up the cookie
         
+        await queryClient.refetchQueries({ queryKey: ["authUser"] });
+
         if (currentWorkspace) {
           navigate(`/workspace/${currentWorkspace}`);
         } else {
@@ -29,7 +46,7 @@ const GoogleOAuth = () => {
       }
     };
     handleLogin();
-  }, [accessToken, currentWorkspace, navigate, setAccessToken, queryClient]);
+  }, [currentWorkspace, navigate, setAccessToken, queryClient]);
 
 
   return (

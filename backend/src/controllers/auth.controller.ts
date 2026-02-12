@@ -18,11 +18,15 @@ export const googleLoginCallback = asyncHandler(
       );
     }
 
-    // return res.redirect(
-    //   `${config.FRONTEND_ORIGIN}/workspace/${currentWorkspace}`
-    // );
+    res.cookie("auth_token", jwt, {
+      httpOnly: false, // Allow client JS to read it
+      secure: config.NODE_ENV === "production",
+      maxAge: 24 * 60 * 60 * 1000, // 1 day
+      sameSite: "lax",
+    });
+
     return res.redirect(
-      `${config.FRONTEND_GOOGLE_CALLBACK_URL}?status=success&access_token=${jwt}&currentworkspace=${currentWorkspace}`
+      `${config.FRONTEND_GOOGLE_CALLBACK_URL}?status=success&currentworkspace=${currentWorkspace}`
     );
   }
 );
